@@ -157,7 +157,7 @@ bool StatsRecorder::VisitCStyleCastExpr(clang::CStyleCastExpr *C) {
     if (PSL.valid() && canWrite(PSL.getFileName())) {
       QualType SrcT = C->getSubExpr()->getType();
       QualType DstT = C->getType();
-      if (SrcT->isCheckedPointerType() && !DstT->isCheckedPointerType())
+      if (SrcT.isCheckedPointerType() && !DstT.isCheckedPointerType())
         PStats.incrementNumWildCasts();
     }
   }

@@ -7064,9 +7064,9 @@ ExprResult Sema::CreateTemporaryForCallIfNeeded(ExprResult ER) {
 
       if ((ReturnBounds && (ReturnBounds->isByteCount() ||
                             ReturnBounds->isElementCount())) ||
-          FPT->getReturnType()->isCheckedPointerPtrType() ||
+          FPT->getReturnType().isCheckedPointerPtrType() ||
           (InteropExpr &&
-           InteropExpr->getType()->isCheckedPointerPtrType()) ||
+           InteropExpr->getType().isCheckedPointerPtrType()) ||
           ContainsReturnValueExpr(ReturnBounds))
         ER = new (Context) CHKCBindTemporaryExpr(ER.get());
     }
@@ -9510,8 +9510,8 @@ Sema::CheckAssignmentConstraints(QualType LHSType, ExprResult &RHS,
   // If the LHS has type nt_array_ptr<T> and the RHS is an unchecked pointer
   // or array with bounds-safe interface type nt_array_ptr<U>, use the RHS
   // bounds-safe interface type nt_array_ptr<U> to check the types.
-  if (LHSType->isCheckedPointerNtArrayType() &&
-      (RHSType->isUncheckedPointerType() ||
+  if (LHSType.isCheckedPointerNtArrayType() &&
+      (RHSType.isUncheckedPointerType() ||
         RHSType->isUncheckedArrayType())) {
     QualType RHSInteropType = GetCheckedCRValueInteropType(RHS);
     if (!RHSInteropType.isNull())
@@ -9922,7 +9922,7 @@ static bool arrayConstantCheckedConversion(Sema &S, QualType LHSType,
   const PointerType *RHSPointerType = RHSType->getAs<PointerType>();
   const PointerType *LHSPointerType = LHSType->getAs<PointerType>();
 
-  if (!LHSType->isCheckedPointerType() || !RHSPointerType ||
+  if (!LHSType.isCheckedPointerType() || !RHSPointerType ||
       LHSPointerType->getKind() == RHSPointerType->getKind())
     return false;
 
@@ -9932,7 +9932,7 @@ static bool arrayConstantCheckedConversion(Sema &S, QualType LHSType,
 
   // For checked null-terminated pointers, only retype the constant if the
   // type would be a valid null-terminated ponter type.
-  if (LHSType->isCheckedPointerNtArrayType() && !RHSPointee->isIntegerType() &&
+  if (LHSType.isCheckedPointerNtArrayType() && !RHSPointee->isIntegerType() &&
       !RHSPointee->isPointerType())
     return false;
 
@@ -10891,8 +10891,8 @@ QualType Sema::CheckRemainderOperands(
 /// Diagnose invalid arithmetic on two void pointers.
 static void diagnoseArithmeticOnTwoVoidPointers(Sema &S, SourceLocation Loc,
                                                 Expr *LHSExpr, Expr *RHSExpr) {
-  bool isCheckedPointerType = (LHSExpr->getType()->isCheckedPointerType() ||
-                               RHSExpr->getType()->isCheckedPointerType()) &&
+  bool isCheckedPointerType = (LHSExpr->getType().isCheckedPointerType() ||
+                               RHSExpr->getType().isCheckedPointerType()) &&
                               !S.getLangOpts()._3C;
     S.Diag(Loc, S.getLangOpts().CPlusPlus || isCheckedPointerType
                     ? diag::err_typecheck_pointer_arith_void_type
@@ -10904,7 +10904,7 @@ static void diagnoseArithmeticOnTwoVoidPointers(Sema &S, SourceLocation Loc,
 /// Diagnose invalid arithmetic on a void pointer.
 static void diagnoseArithmeticOnVoidPointer(Sema &S, SourceLocation Loc,
                                             Expr *Pointer) {
-  bool isCheckedPointerType = Pointer->getType()->isCheckedPointerType() &&
+  bool isCheckedPointerType = Pointer->getType().isCheckedPointerType() &&
                               !S.getLangOpts()._3C;
   S.Diag(Loc, S.getLangOpts().CPlusPlus || isCheckedPointerType
                 ? diag::err_typecheck_pointer_arith_void_type
@@ -10964,7 +10964,7 @@ static void diagnoseArithmeticOnFunctionPointer(Sema &S, SourceLocation Loc,
 /// Diagnose invalid arithmetic on a CheckedC _Ptr type
 static void diagnoseArithmeticOnPtrPointerType(Sema &S, SourceLocation Loc,
     Expr *Pointer) {
-    assert(Pointer->getType()->isCheckedPointerPtrType());
+    assert(Pointer->getType().isCheckedPointerPtrType());
     S.Diag(Loc, diag::err_typecheck_ptr_arithmetic)
         << Pointer->getSourceRange();
 }
@@ -11002,7 +11002,7 @@ static bool checkArithmeticOpPointerOperand(Sema &S, SourceLocation Loc,
 
   if (!ResType->isAnyPointerType()) return true;
 
-  if (ResType->isCheckedPointerPtrType() && !S.getLangOpts()._3C) {
+  if (ResType.isCheckedPointerPtrType() && !S.getLangOpts()._3C) {
      diagnoseArithmeticOnPtrPointerType(S, Loc, Operand);
      return false;
   }
@@ -11010,11 +11010,11 @@ static bool checkArithmeticOpPointerOperand(Sema &S, SourceLocation Loc,
   QualType PointeeTy = ResType->getPointeeType();
   if (PointeeTy->isVoidType()) {
     diagnoseArithmeticOnVoidPointer(S, Loc, Operand);
-    return !(S.getLangOpts().CPlusPlus || ResType->isCheckedPointerType());
+    return !(S.getLangOpts().CPlusPlus || ResType.isCheckedPointerType());
   }
   if (PointeeTy->isFunctionType()) {
     diagnoseArithmeticOnFunctionPointer(S, Loc, Operand);
-    return !(S.getLangOpts().CPlusPlus || ResType->isCheckedPointerType());
+    return !(S.getLangOpts().CPlusPlus || ResType.isCheckedPointerType());
   }
 
 
@@ -11062,8 +11062,8 @@ static bool checkArithmeticBinOpPointerOperands(Sema &S, SourceLocation Loc,
     else diagnoseArithmeticOnTwoVoidPointers(S, Loc, LHSExpr, RHSExpr);
 
     return !(S.getLangOpts().CPlusPlus ||
-            ((LHSExpr->getType()->isCheckedPointerType() ||
-             RHSExpr->getType()->isCheckedPointerType()) &&
+            ((LHSExpr->getType().isCheckedPointerType() ||
+             RHSExpr->getType().isCheckedPointerType()) &&
              !S.getLangOpts()._3C));
   }
 
@@ -12448,9 +12448,9 @@ QualType Sema::CheckCompareOperands(ExprResult &LHS, ExprResult &RHS,
       // Avoid introducing an implicit cast to _Ptr type. Implicit casts to
       // _Ptr type require that the source operand have bounds large enough
       // to hold the pointee type.  The source operand may not have those bounds.
-      else if (!LHSType->isCheckedPointerPtrType())
+      else if (!LHSType.isCheckedPointerPtrType())
         RHS = ImpCastExprToType(RHS.get(), LHSType, Kind);
-      else  if (!RHSType->isCheckedPointerPtrType())
+      else  if (!RHSType.isCheckedPointerPtrType())
         LHS = ImpCastExprToType(LHS.get(), RHSType, Kind);
       else {
         QualType TargetType =
@@ -13613,7 +13613,7 @@ QualType Sema::CheckAssignmentOperands(Expr *LHSExpr, ExprResult &RHS,
 
     QualType LHSTy(LHSType);
     QualType LHSInteropType;
-    if (getLangOpts().CheckedC && LHSTy->isUncheckedPointerType())
+    if (getLangOpts().CheckedC && LHSTy.isUncheckedPointerType())
       LHSInteropType = GetCheckedCLValueInteropType(LHSExpr);
     ConvTy = CheckSingleAssignmentConstraints(LHSTy, RHS, /*Diagnose=*/true,
                                               /*DiagnoseCFAudited=*/false,
@@ -16083,7 +16083,7 @@ ExprResult Sema::ActOnBoundsCastExprBounds(
   if (CheckBoundsCastBaseType(E1))
     return ExprError();
 
-  if (!DestTy->isCheckedPointerArrayType()) {
+  if (!DestTy.isCheckedPointerArrayType()) {
     Diag(TypeLoc, diag::err_bounds_cast_expected_array_ptr);
     return ExprError();
   } else if (Bounds->isElementCount() && DestTy->isVoidPointerType()) {
@@ -16112,7 +16112,7 @@ ExprResult Sema::ActOnBoundsCastExprSingle(
   if (CheckBoundsCastBaseType(E1))
     return ExprError();
 
-  if (DestTy->isCheckedPointerPtrType() || DestTy->isUncheckedPointerType()) {
+  if (DestTy.isCheckedPointerPtrType() || DestTy.isUncheckedPointerType()) {
     if (DestTy->isVoidPointerType())
       Bounds = Context.getPrebuiltByteCountOne();
     else

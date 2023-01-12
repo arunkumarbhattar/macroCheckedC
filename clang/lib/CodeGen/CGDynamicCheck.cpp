@@ -62,7 +62,7 @@ static bool shouldEmitNonNullCheck(const CodeGenModule &CGM,
   if (!CGM.getLangOpts().CheckedC)
     return false;
 
-  if (!(BaseTy->isCheckedPointerType() || BaseTy->isCheckedArrayType()))
+  if (!(BaseTy.isCheckedPointerType() || BaseTy->isCheckedArrayType()))
     return false;
 
   return true;

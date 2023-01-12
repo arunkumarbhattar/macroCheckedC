@@ -9586,7 +9586,7 @@ QualType ASTContext::mergeFunctionTypes(QualType lhs, QualType rhs,
         // bounds is compatible with a return without bounds.
         // The merged type includes the bounds.
         // Ignore the error if we do not want to consider checked pointers.
-        if (!retType->isUncheckedPointerType() &&
+        if (!retType.isUncheckedPointerType() &&
             !getLangOpts()._3C)
           return QualType();
         if (!lReturnAnnots.IsEmpty() && rReturnAnnots.IsEmpty()) {
@@ -9642,7 +9642,7 @@ QualType ASTContext::mergeFunctionTypes(QualType lhs, QualType rhs,
           // bounds is compatible with a parameter without bounds.
           // The merged type includes the bounds.
           // Ignored the error if we do not want to consider checked pointers.
-          if (!paramType->isUncheckedPointerType() &&
+          if (!paramType.isUncheckedPointerType() &&
               !getLangOpts()._3C)
             return QualType();
           if (!lBounds.IsEmpty() && rBounds.IsEmpty()) {
@@ -10563,7 +10563,7 @@ bool ASTContext::isNotAllowedForNoPrototypeFunction(QualType QT) const {
          if (isNotAllowedForNoPrototypeFunction(FieldType))
            return true;
          if (!FieldDecl->getBoundsAnnotations().IsEmpty() &&
-             !FieldType->isUncheckedPointerType())
+             !FieldType.isUncheckedPointerType())
            return true;
        }
     }

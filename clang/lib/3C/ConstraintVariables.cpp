@@ -356,12 +356,12 @@ PointerVariableConstraint::PointerVariableConstraint(
       break;
     }
 
-    if (Ty->isCheckedPointerType() || Ty->isCheckedArrayType()) {
+    if (QTy.isCheckedPointerType() || Ty->isCheckedArrayType()) {
       ConstAtom *CAtom = nullptr;
-      if (Ty->isCheckedPointerNtArrayType() || Ty->isNtCheckedArrayType()) {
+      if (QTy.isCheckedPointerNtArrayType() || Ty->isNtCheckedArrayType()) {
         // This is an NT array type.
         CAtom = CS.getNTArr();
-      } else if (Ty->isCheckedPointerArrayType() || Ty->isCheckedArrayType()) {
+      } else if (QTy.isCheckedPointerArrayType() || Ty->isCheckedArrayType()) {
         // This is an array type.
         CAtom = CS.getArr();
 
@@ -376,7 +376,7 @@ PointerVariableConstraint::PointerVariableConstraint(
               CAtom = CS.getPtr();
             }
 
-      } else if (Ty->isCheckedPointerPtrType()) {
+      } else if (QTy.isCheckedPointerPtrType()) {
         // This is a regular checked pointer.
         CAtom = CS.getPtr();
       }

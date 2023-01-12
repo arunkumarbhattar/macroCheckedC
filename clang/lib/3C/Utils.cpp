@@ -94,13 +94,13 @@ SourceLocation locationPrecedingChar(SourceLocation SL, SourceManager &S,
 clang::CheckedPointerKind getCheckedPointerKind(InteropTypeExpr *ItypeExpr) {
   TypeSourceInfo *InteropTypeInfo = ItypeExpr->getTypeInfoAsWritten();
   const clang::Type *InnerType = InteropTypeInfo->getType().getTypePtr();
-  if (InnerType->isCheckedPointerNtArrayType()) {
+  if (InteropTypeInfo->getType().isCheckedPointerNtArrayType()) {
     return CheckedPointerKind::NtArray;
   }
-  if (InnerType->isCheckedPointerArrayType()) {
+  if (InteropTypeInfo->getType().isCheckedPointerArrayType()) {
     return CheckedPointerKind::Array;
   }
-  if (InnerType->isCheckedPointerType()) {
+  if (InteropTypeInfo->getType().isCheckedPointerType()) {
     return CheckedPointerKind::Ptr;
   }
   return CheckedPointerKind::Unchecked;

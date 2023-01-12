@@ -7966,9 +7966,9 @@ void CheckFormatHandler::CheckVarargsInCheckedScope(
   default:
     // In scanf-like functions, only allow _Ptr type arguments.
     if (IsFuncScanfLike) {
-      if (ArgTy->isCheckedPointerNtArrayType() ||
+      if (ArgTy.isCheckedPointerNtArrayType() ||
           ArgTy->isNtCheckedArrayType() ||
-          ArgTy->isCheckedPointerArrayType() ||
+          ArgTy.isCheckedPointerArrayType() ||
           ArgTy->isCheckedArrayType()) {
         EmitFormatDiagnostic(
           S.PDiag(diag::err_checked_scope_invalid_format_specifier_argument)
@@ -7990,7 +7990,7 @@ void CheckFormatHandler::CheckVarargsInCheckedScope(
     // Issue https://github.com/microsoft/checkedc-clang/issues/1178 tracks this.
 
     } else {
-      if (ArgTy->isCheckedPointerType()) {
+      if (ArgTy.isCheckedPointerType()) {
         EmitFormatDiagnostic(
           S.PDiag(diag::err_checked_scope_invalid_format_specifier_argument)
             << FSString << "scalar",
@@ -8010,7 +8010,7 @@ void CheckFormatHandler::CheckVarargsInCheckedScope(
         E->getExprLoc(), /*IsStringLocation*/false,
         getSpecifierRange(StartSpecifier, SpecifierLen));
 
-    } else if (!ArgTy->isCheckedPointerNtArrayType() &&
+    } else if (!ArgTy.isCheckedPointerNtArrayType() &&
                !ArgTy->isNtCheckedArrayType()) {
       EmitFormatDiagnostic(
         S.PDiag(diag::err_checked_scope_invalid_format_specifier_argument)
@@ -15499,7 +15499,7 @@ bool Sema::AllowedInCheckedScope(QualType Ty,
     Loc = CSTL_Nested;
 
   if (Ty->isPointerType() || Ty->isArrayType()) {
-    if ((Ty->isUncheckedPointerType() || Ty->isUncheckedArrayType()) &&
+    if ((Ty.isUncheckedPointerType() || Ty->isUncheckedArrayType()) &&
         !InteropType) {
       ProblemLoc = CurrentLoc;
       ProblemTy = Ty;

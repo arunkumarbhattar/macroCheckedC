@@ -2963,7 +2963,7 @@ void CastOperation::CheckCStyleCast(bool IsCheckedScope) {
   if (IsCheckedScope) {
     bool isNullPointerConstant =
       DestType->isVoidPointerType() &&
-      DestType->isUncheckedPointerType() &&
+      DestType.isUncheckedPointerType() &&
       !SrcExpr.isInvalid() &&
       SrcExpr.get()->isNullPointerConstant(Self.Context,
                                            Expr::NPC_NeverValueDependent);
@@ -2976,8 +2976,8 @@ void CastOperation::CheckCStyleCast(bool IsCheckedScope) {
 
     // Disallow cast from other Checked Pointer types to nt_arary_ptr because 
     // the SrcType might not point to a NULL-terminated array.
-    if (DestType->isPointerType() && DestType->isCheckedPointerNtArrayType()) {
-        if (SrcType->isPointerType() && !SrcType->isCheckedPointerNtArrayType()) {
+    if (DestType->isPointerType() && DestType.isCheckedPointerNtArrayType()) {
+        if (SrcType->isPointerType() && !SrcType.isCheckedPointerNtArrayType()) {
           Self.Diag(SrcExpr.get()->getExprLoc(),
               diag::err_checked_scope_no_cast_to_nt_array_ptr)
             << SrcType << DestType << SrcExpr.get()->getSourceRange();

@@ -4403,7 +4403,7 @@ bool Type::isOrContainsCheckedType() const {
   switch (current->getTypeClass()) {
     case Type::Pointer: {
       const PointerType *ptr = cast<PointerType>(current);
-      if (ptr->isCheckedPointerType()) {
+      if (CanonicalType.isCheckedPointerType()) {
         return true;
       }
       return ptr->getPointeeType()->isOrContainsCheckedType();
@@ -4440,7 +4440,7 @@ bool Type::isOrContainsUncheckedType() const {
   switch (current->getTypeClass()) {
     case Type::Pointer: {
       const PointerType *ptr = cast<PointerType>(current);
-      if (ptr->isUncheckedPointerType())
+      if (CanonicalType.isUncheckedPointerType())
         return true;
       return ptr->getPointeeType()->isOrContainsUncheckedType();
     }
@@ -4480,7 +4480,7 @@ Type::CheckedValueKind Type::containsCheckedValue(bool InCheckedScope) const {
   switch (current->getTypeClass()) {
   case Type::Pointer: {
     const PointerType *ptr = cast<PointerType>(current);
-    return ptr->isCheckedPointerType() ? Type::HasCheckedValue : Type::NoCheckedValue;
+    return CanonicalType.isCheckedPointerType() ? Type::HasCheckedValue : Type::NoCheckedValue;
   }
   case Type::ConstantArray:
   case Type::DependentSizedArray:
@@ -4503,7 +4503,7 @@ Type::CheckedValueKind Type::containsCheckedValue(bool InCheckedScope) const {
         return Type::HasIntWithBounds;
       
       // An unchecked pointer in a checked scope with a bounds expression must be initialized
-      if (FD->getType()->isUncheckedPointerType() && FD->hasBoundsExpr() && InCheckedScope)
+      if (FD->getType().isUncheckedPointerType() && FD->hasBoundsExpr() && InCheckedScope)
         return Type::HasUncheckedPointer;
 
       if (FD->getType()->isRecordType())
@@ -4513,7 +4513,7 @@ Type::CheckedValueKind Type::containsCheckedValue(bool InCheckedScope) const {
       // its type must be (1) _Ptr (2) _Array_ptr or (3) _Nt_array_ptr
       else if (FD->getType()->containsCheckedValue(InCheckedScope)) {
         // Case 1: _Ptr always needs to be initialized
-        if (FD->getType()->isCheckedPointerPtrType())
+        if (FD->getType().isCheckedPointerPtrType())
           hasCheckedField = Type::HasCheckedValue;
         // Case 2: _Array_ptr needs to be initialized if it has bounds and the bounds are NOT unknown;
         // Case 3: _Nt_array_ptr needs to be initialized if (1) it has no bounds specified
@@ -4521,7 +4521,7 @@ Type::CheckedValueKind Type::containsCheckedValue(bool InCheckedScope) const {
         // since for _Nt_array_ptr we always attach default bounds of count(0) to a decl, 
         // if no bounds are specified (done in ActOnBoundsDecl and before this checking),
         // we can simplified the checking by combining case 2 and 3
-        else if (FD->getType()->isCheckedPointerArrayType() && FD->hasBoundsExpr()) {
+        else if (FD->getType().isCheckedPointerArrayType() && FD->hasBoundsExpr()) {
           if (!FD->getBoundsExpr()->isUnknown())
             hasCheckedField = Type::HasCheckedValue;
         }

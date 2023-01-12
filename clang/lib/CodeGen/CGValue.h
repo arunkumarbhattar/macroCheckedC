@@ -600,6 +600,39 @@ public:
       Quals.removeVolatile();
   }
 
+  bool isCheckedPtr() const {
+    return Quals.hasCheckedPtr();
+  }
+
+  void setCheckedPtr(bool flag) {
+    if (flag)
+      Quals.addCheckedPtr();
+    else
+      Quals.removeCheckedPtr();
+  }
+
+  bool isCheckedArrayPtr() const {
+    return Quals.hasCheckedArrayPtr();
+  }
+
+  void setCheckedArrayPtr(bool flag) {
+    if (flag)
+      Quals.addCheckedArrayPtr();
+    else
+      Quals.removeCheckedArrayPtr();
+  }
+
+  bool isCheckedNtArrayPtr() const {
+    return Quals.hasCheckedNtArrayPtr();
+  }
+
+  void setCheckedNtArrayPtr(bool flag) {
+    if (flag)
+      Quals.addCheckedNtArrayPtr();
+    else
+      Quals.removeCheckedNtArrayPtr();
+  }
+
   Qualifiers::ObjCLifetime getObjCLifetime() const {
     return Quals.getObjCLifetime();
   }

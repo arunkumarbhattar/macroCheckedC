@@ -139,7 +139,7 @@ BoundsExpr *BoundsUtil::ExpandToRange(Sema &S, Expr *Base, BoundsExpr *B) {
       } else {
         ResultTy = Base->getType();
         LowerBound = Base;
-        if (ResultTy->isCheckedPointerPtrType()) {
+        if (ResultTy.isCheckedPointerPtrType()) {
           ResultTy = S.Context.getPointerType(ResultTy->getPointeeType(),
             CheckedPointerKind::Array);
           // The bounds-safe interface argument is false because casts

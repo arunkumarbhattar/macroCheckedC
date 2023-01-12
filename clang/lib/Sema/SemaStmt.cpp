@@ -3918,7 +3918,7 @@ StmtResult Sema::BuildReturnStmt(SourceLocation ReturnLoc, Expr *RetValExp) {
       // In Checked C, it is an error if a return expression is
       // missing in a checked scope or when there are return bounds.
       if (getLangOpts().CheckedC) {
-        if (FnRetType->isCheckedPointerType())
+        if (FnRetType.isCheckedPointerType())
           DiagID = diag::err_return_missing_expr_for_checked_pointer;
         else if (!FnRetBounds.IsEmpty())
           DiagID = diag::err_return_missing_expr_for_bounds;
