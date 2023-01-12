@@ -7148,7 +7148,7 @@ inline bool Type::isCheckedPointerTypeInternal() const {
 }
 
 inline bool QualType::isCheckedPointerType() const {
-  this->getTypePtr()->isCheckedPointerTypeInternal() ||
+  return this->getTypePtr()->isCheckedPointerTypeInternal() ||
   this->isCheckedQualified();
 }
 
@@ -7159,7 +7159,7 @@ inline bool Type::isUncheckedPointerTypeInternal() const {
 }
 
 inline bool QualType::isUncheckedPointerType() const {
-    this->getTypePtr()->isUncheckedPointerTypeInternal() &&
+    return this->getTypePtr()->isUncheckedPointerTypeInternal() &&
       (!this->isCheckedQualified());
 }
 inline bool Type::isCheckedPointerPtrTypeInternal() const {
@@ -7311,7 +7311,7 @@ inline bool Type::isExactlyCheckedArrayTypeInternal() const {
 }
 
 inline bool QualType::isExactlyCheckedArrayType() const {
-  this->getTypePtr()->isExactlyCheckedArrayTypeInternal() ||
+  return this->getTypePtr()->isExactlyCheckedArrayTypeInternal() ||
   this->isCheckedArrayQualified();
 }
 
