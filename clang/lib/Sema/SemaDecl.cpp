@@ -4076,7 +4076,7 @@ static bool diagnoseBoundsError(Sema &S,
   // A declaration of an object with unchecked pointer or array type is
   // compatible with a later declaration that adds bounds/interop annotations.
   bool IsUncheckedType =
-    (OldType->isUncheckedPointerType() && NewType->isUncheckedPointerType()) ||
+    (OldType.isUncheckedPointerType() && NewType.isUncheckedPointerType()) ||
     (OldType->isUncheckedArrayType() && NewType->isUncheckedArrayType());
 
   // The usage of annotations must match. We can't have one declaration has only
@@ -4347,7 +4347,7 @@ bool Sema::CheckedCMergeFunctionDecls(FunctionDecl *New, FunctionDecl *Old) {
     for (unsigned i = 0; i < ParamCount; i++) {
       QualType ParamType = NewType->getParamType(i);
       const BoundsAnnotations ParamAnnots = NewType->getParamAnnots(i);
-      if (ParamType->isUncheckedPointerType() ||
+      if (ParamType.isUncheckedPointerType() ||
           ParamType->isUncheckedArrayType()) {
         ParmVarDecl *ParamDecl = New->getParamDecl(i);
         BoundsExpr *ParamBounds = ParamAnnots.getBoundsExpr();
@@ -13195,7 +13195,7 @@ bool Sema::ValidateNTCheckedType(ASTContext &Ctx, QualType VDeclType,
         }
         Expr *CurrInit = ILE->getInit(index++);
         if (FD->getType()->isIntegerType() ||
-            FD->getType()->isUncheckedPointerType()) {
+            FD->getType().isUncheckedPointerType()) {
           continue;
         }
         // Recursive call to handle members of the RecordDecl fields
@@ -13352,7 +13352,7 @@ void Sema::ActOnUninitializedDecl(Decl *RealDecl) {
       if (InCheckedScope && Var->hasInteropTypeExpr())
         Ty = Var->getInteropType();
 
-      if (Ty->isCheckedPointerPtrType() && !getLangOpts()._3C)
+      if (Ty.isCheckedPointerPtrType() && !getLangOpts()._3C)
         Diag(Var->getLocation(), diag::err_initializer_expected_for_ptr)
           << Var;
       else if (B && !B->isInvalid() && !B->isUnknown() &&
@@ -13362,7 +13362,7 @@ void Sema::ActOnUninitializedDecl(Decl *RealDecl) {
 
       // An unchecked pointer in a checked scope with a bounds expression must
       // be initialized
-      if (Ty->isUncheckedPointerType() && InCheckedScope &&
+      if (Ty.isUncheckedPointerType() && InCheckedScope &&
           Var->hasBoundsExpr() && !getLangOpts()._3C)
         Diag(Var->getLocation(),
              diag::err_initializer_expected_for_unchecked_pointer)
@@ -14818,7 +14818,7 @@ static bool checkBoundsDeclWithBoundsExpr(Sema &S, QualType Ty,
   // problems to more specific problems.   We don't want to suggest
   // fixes that will not work because there's a more general problem.
 
-  if (Ty->isCheckedPointerPtrType())
+  if (Ty.isCheckedPointerPtrType())
     // _Ptr types cannot have bounds expressions
     DiagId = IsReturnAnnots ? diag::err_typecheck_ptr_return_with_bounds
                             : diag::err_typecheck_ptr_decl_with_bounds;
@@ -14916,7 +14916,7 @@ bool Sema::DiagnoseBoundsDeclType(QualType Ty, DeclaratorDecl *D,
 
   if (IType && BE && !BE->isInvalid() && (!D || !D->isInvalidDecl())) {
      QualType QT = IType->getType();
-     if (!QT.isNull() && QT->isCheckedPointerPtrType()) {
+     if (!QT.isNull() && QT.isCheckedPointerPtrType()) {
        isError = true;
        if (D) {
          Diag(BE->getBeginLoc(),
@@ -14991,7 +14991,7 @@ void Sema::ActOnBoundsDecl(DeclaratorDecl *D, BoundsAnnotations Annots,
     }
 
     if (BoundsExpr) {
-      if (Ty->isPointerType() && !Ty->isCheckedPointerType())
+      if (Ty->isPointerType() && !Ty.isCheckedPointerType())
         DiagId = diag::err_bounds_declaration_unchecked_local_pointer;
       else if (Ty->isArrayType() && !Ty->isCheckedArrayType())
         DiagId = diag::err_bounds_declaration_unchecked_local_array;
@@ -15079,8 +15079,8 @@ void Sema::InferBoundsAnnots(QualType Ty, BoundsAnnotations &Annots, bool IsPara
           BoundsUtil::CreateBoundsForArrayType(*this, IType->getType());
 
     if (!BoundsExpr)
-      if (Ty->isCheckedPointerNtArrayType() || (IType &&
-                   IType->getType()->isCheckedPointerNtArrayType()))
+      if (Ty.isCheckedPointerNtArrayType() || (IType &&
+                   IType->getType().isCheckedPointerNtArrayType()))
         BoundsExpr = Context.getPrebuiltCountZero();
   }
 

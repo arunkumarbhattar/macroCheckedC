@@ -1968,7 +1968,7 @@ bool DeclaratorDecl::hasBoundsDeclaration(const ASTContext &Ctx) const {
         return false;
       if (const FunctionType *FT = QT->getAs<FunctionType>())
         QT = FT->getReturnType();
-      return (QT->isCheckedPointerType() || QT->isCheckedArrayType() ||
+      return (QT.isCheckedPointerType() || QT->isCheckedArrayType() ||
               QT->isIntegralType(Ctx));
   }
   return false;

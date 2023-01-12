@@ -25,7 +25,7 @@ using namespace sema;
 QualType Sema::SynthesizeInteropType(QualType Ty, bool isParam) {
   // Nothing to do.
   if (Ty.isNull() || Ty->isCheckedArrayType() ||
-    Ty->isCheckedPointerType())
+    Ty.isCheckedPointerType())
     return QualType();
 
   QualType ResultType = QualType();
@@ -125,7 +125,7 @@ public:
 
     // Update return type information.
     if (!EPI.ReturnAnnots.IsEmpty()) {
-      if (ResultLoc.getType()->isUncheckedPointerType()) {
+      if (ResultLoc.getType().isUncheckedPointerType()) {
          InteropTypeExpr *IT = EPI.ReturnAnnots.getInteropTypeExpr();
          BoundsExpr *Bounds = EPI.ReturnAnnots.getBoundsExpr();
          assert(Bounds == nullptr || (Bounds != nullptr && IT));
@@ -164,7 +164,7 @@ public:
         BoundsAnnotations IndividualAnnots =  EPI.ParamAnnots[i];
         CurrentParamAnnots.push_back(IndividualAnnots);
 
-        if (CurrentParamTypes[i]->isUncheckedPointerType() &&
+        if (CurrentParamTypes[i].isUncheckedPointerType() &&
             IndividualAnnots.getInteropTypeExpr()) {
           InteropTypeExpr *IT = IndividualAnnots.getInteropTypeExpr();
           QualType ParamType = IT->getType();

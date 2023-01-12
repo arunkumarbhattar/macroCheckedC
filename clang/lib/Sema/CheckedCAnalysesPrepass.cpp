@@ -168,7 +168,7 @@ class PrepassHelper : public RecursiveASTVisitor<PrepassHelper> {
       // lower and upper bounds. For example:
       // void f(_Nt_array_ptr<char> p);
       // char p _Checked[] = "ab";
-      } else if (V->getType()->isCheckedPointerArrayType() ||
+      } else if (V->getType().isCheckedPointerArrayType() ||
                  V->getType()->isCheckedArrayType()) {
         AddPtrWithBounds(Info.BoundsVarsLower, V, V);
         AddPtrWithBounds(Info.BoundsVarsUpper, V, V);

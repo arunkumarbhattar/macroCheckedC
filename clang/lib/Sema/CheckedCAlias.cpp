@@ -253,7 +253,7 @@ private:
 
   void CheckOperand(Expr *E, bool IsCheckedScope) {
     // Simple check for variables with bounds.
-    if (E->getType()->isCheckedPointerType())
+    if (E->getType().isCheckedPointerType())
       if (VarDecl *D = Helper::ComputeVar(E)) {
         if (D->hasBoundsExpr()) {
           SemaRef.Diag(E->getBeginLoc(),
@@ -327,7 +327,7 @@ private:
 public:
   bool VisitUnaryOperator(UnaryOperator *UO) {
     if (UO->getOpcode() == UO_AddrOf)
-      CheckOperand(UO->getSubExpr(), UO->getType()->isCheckedPointerType());
+      CheckOperand(UO->getSubExpr(), UO->getType().isCheckedPointerType());
     return true;
   }
 };

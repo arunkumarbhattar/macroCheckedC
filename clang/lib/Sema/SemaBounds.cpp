@@ -890,7 +890,7 @@ namespace {
         BoundsCheckKind Kind = BCK_Normal;
         // Null-terminated array pointers have special semantics for
         // bounds checks.
-        if (PtrType->isCheckedPointerNtArrayType()) {
+        if (PtrType.isCheckedPointerNtArrayType()) {
           if (OpKind == OperationKind::Read)
             Kind = BCK_NullTermRead;
           else if (OpKind == OperationKind::Assign)
@@ -937,7 +937,7 @@ namespace {
       }
 
       // E->F.  This is equivalent to (*E).F.
-      if (Base->getType()->isCheckedPointerArrayType()) {
+      if (Base->getType().isCheckedPointerArrayType()) {
         BoundsExpr *Bounds = S.CheckNonModifyingBounds(BaseBounds, Base);
         if (Bounds->isUnknown()) {
           S.Diag(Base->getBeginLoc(), diag::err_expected_bounds) << Base->getSourceRange();
@@ -2599,8 +2599,8 @@ namespace {
                                         BoundsExpr *SrcBounds,
                                         CheckedScopeSpecifier CSS) {
       ProofFailure Cause;
-      bool IsStaticPtrCast = (Src->getType()->isCheckedPointerPtrType() &&
-                              Cast->getType()->isCheckedPointerPtrType());
+      bool IsStaticPtrCast = (Src->getType().isCheckedPointerPtrType() &&
+                              Cast->getType().isCheckedPointerPtrType());
       ProofStmtKind Kind = IsStaticPtrCast ? ProofStmtKind::StaticBoundsCast :
                              ProofStmtKind::BoundsDeclaration;
       FreeVariableListTy FreeVars;
@@ -3321,11 +3321,11 @@ namespace {
     }
 
     bool IsBoundsSafeInterfaceAssignment(QualType DestTy, Expr *E) {
-      if (DestTy->isUncheckedPointerType()) {
+      if (DestTy.isUncheckedPointerType()) {
         ImplicitCastExpr *ICE = dyn_cast<ImplicitCastExpr>(E);
         if (ICE)
           return ICE && ICE->getCastKind() == CK_BitCast &&
-                 ICE->getSubExpr()->getType()->isCheckedPointerType();
+                 ICE->getSubExpr()->getType().isCheckedPointerType();
       }
       return false;
     }
@@ -3503,11 +3503,11 @@ namespace {
         BoundsExpr *RightBounds = nullptr;
 
         if (!E->isCompoundAssignmentOp() &&
-            LHSType->isCheckedPointerPtrType() &&
-            RHS->getType()->isCheckedPointerPtrType()) {
+            LHSType.isCheckedPointerPtrType() &&
+            RHS->getType().isCheckedPointerPtrType()) {
           // ptr<T> to ptr<T> assignment, no obligation to check assignment bounds
         }
-        else if (LHSType->isCheckedPointerType() ||
+        else if (LHSType.isCheckedPointerType() ||
                   LHSType->isIntegerType() ||
                   IsBoundsSafeInterfaceAssignment(LHSType, RHS)) {
           // Check that the value being assigned has bounds if the
@@ -3617,7 +3617,7 @@ namespace {
         QualType ParamType = FuncProtoTy->getParamType(i);
         // Skip checking bounds for unchecked pointer parameters, unless
         // the argument was subject to a bounds-safe interface cast.
-        if (ParamType->isUncheckedPointerType() && !IsBoundsSafeInterfaceAssignment(ParamType, E->getArg(i))) {
+        if (ParamType.isUncheckedPointerType() && !IsBoundsSafeInterfaceAssignment(ParamType, E->getArg(i))) {
           continue;
         }
         // We want to check the argument expression implies the desired parameter bounds.
@@ -3772,7 +3772,7 @@ namespace {
       // _Ptr is invalid, that will be diagnosed separately.
       if (E->getStmtClass() == Stmt::ImplicitCastExprClass ||
           E->getStmtClass() == Stmt::CStyleCastExprClass) {
-        if (E->getType()->isCheckedPointerPtrType())
+        if (E->getType().isCheckedPointerPtrType())
           ResultBounds = CreateTypeBasedBounds(E, E->getType(), false, false);
         else
           ResultBounds = RValueCastBounds(E, SubExprTargetBounds,
@@ -3838,7 +3838,7 @@ namespace {
 
       // Casts to _Ptr type must have a source for which we can infer bounds.
       if ((CK == CK_BitCast || CK == CK_IntegralToPointer) &&
-          E->getType()->isCheckedPointerPtrType() &&
+          E->getType().isCheckedPointerPtrType() &&
           !E->getType()->isFunctionPointerType()) {
         SubExprBounds = S.CheckNonModifyingBounds(SubExprBounds, SubExpr);
         if (SubExprBounds->isUnknown()) {
@@ -4534,7 +4534,7 @@ namespace {
       if (CSS != CheckedScopeSpecifier::CSS_Unchecked)
         return false;
 
-      if (A->GetRepresentative()->getType()->isCheckedPointerType() ||
+      if (A->GetRepresentative()->getType().isCheckedPointerType() ||
           A->GetRepresentative()->getType()->isCheckedArrayType())
         return false;
 
@@ -4990,7 +4990,7 @@ namespace {
         // pointer expression during the current top-level statement, bounds
         // validation should skip validating the bounds of LValue.
         if (CSS == CheckedScopeSpecifier::CSS_Unchecked) {
-          if (!LValue->getType()->isCheckedPointerType() &&
+          if (!LValue->getType().isCheckedPointerType() &&
               !LValue->getType()->isCheckedArrayType()) {
             if (IsBoundsSafeInterfaceAssignment(LValue->getType(), Src))
               State.LValuesAssignedChecked.insert(LValueAbstractSet);
@@ -5901,7 +5901,7 @@ namespace {
       // Infer target bounds for variables without array type.
 
       bool IsParam = isa<ParmVarDecl>(DRE->getDecl());
-      if (DRE->getType()->isCheckedPointerPtrType())
+      if (DRE->getType().isCheckedPointerPtrType())
         return CreateTypeBasedBounds(DRE, DRE->getType(), IsParam, false);
 
       if (!VD)
@@ -5926,8 +5926,8 @@ namespace {
       if (UO->getOpcode() == UnaryOperatorKind::UO_Deref) {
         // Currently, we don't know the target bounds of a pointer stored in a
         // pointer dereference, unless it is a _Ptr type or an _Nt_array_ptr.
-        if (UO->getType()->isCheckedPointerPtrType() ||
-            UO->getType()->isCheckedPointerNtArrayType())
+        if (UO->getType().isCheckedPointerPtrType() ||
+            UO->getType().isCheckedPointerNtArrayType())
           return CreateTypeBasedBounds(UO, UO->getType(),
                                                   false, false);
         else
@@ -5945,8 +5945,8 @@ namespace {
                                                CheckedScopeSpecifier CSS) {
       // Currently, we don't know the target bounds of a pointer returned by a
       // subscripting operation, unless it is a _Ptr type or an _Nt_array_ptr.
-      if (ASE->getType()->isCheckedPointerPtrType() ||
-          ASE->getType()->isCheckedPointerNtArrayType())
+      if (ASE->getType().isCheckedPointerPtrType() ||
+          ASE->getType().isCheckedPointerNtArrayType())
         return CreateTypeBasedBounds(ASE, ASE->getType(), false, false);
       else
         return BoundsUtil::CreateBoundsAlwaysUnknown(S);
@@ -6035,7 +6035,7 @@ namespace {
       // it is a function pointer type, in which case it has no required
       // bounds.
 
-      if (Ty->isCheckedPointerPtrType()) {
+      if (Ty.isCheckedPointerPtrType()) {
         if (Ty->isFunctionPointerType())
           BE = CreateBoundsEmpty();
         else if (Ty->isVoidPointerType())
@@ -6045,7 +6045,7 @@ namespace {
       } else if (Ty->isCheckedArrayType()) {
         assert(IsParam && IsBoundsSafeInterface && "unexpected checked array type");
         BE = CreateBoundsForArrayType(Ty);
-      } else if (Ty->isCheckedPointerNtArrayType()) {
+      } else if (Ty.isCheckedPointerNtArrayType()) {
         BE = Context.getPrebuiltCountZero();
       }
    
@@ -6162,7 +6162,7 @@ namespace {
                                CHKCBindTemporaryExpr *ResultName,
                                CheckedScopeSpecifier CSS) {
       BoundsExpr *ReturnBounds = nullptr;
-      if (CE->getType()->isCheckedPointerPtrType()) {
+      if (CE->getType().isCheckedPointerPtrType()) {
         if (CE->getType()->isVoidPointerType())
           ReturnBounds = Context.getPrebuiltByteCountOne();
         else
@@ -6266,7 +6266,7 @@ namespace {
       QualType ToType = E->getType();
 
       // We're only looking for casts to checked function ptr<>s.
-      if (!ToType->isCheckedPointerPtrType() ||
+      if (!ToType.isCheckedPointerPtrType() ||
         !ToType->isFunctionPointerType())
         return;
 
@@ -6278,7 +6278,7 @@ namespace {
       // type too.
       if (const ImplicitCastExpr *ICE = dyn_cast<ImplicitCastExpr>(E))
         if (ICE->getCastKind() == CK_LValueToRValue) {
-          assert(ICE->getSubExpr()->getType()->isCheckedPointerType());
+          assert(ICE->getSubExpr()->getType().isCheckedPointerType());
           return;
         }
 
@@ -6303,7 +6303,7 @@ namespace {
         // Stop at any cast or cast-like operators that have a checked pointer
         // type.  If they are potential problematic casts, they'll be checked
         // by another call to CheckedDisallowedFunctionPtrCasts.
-        if (Needle->getType()->isCheckedPointerType())
+        if (Needle->getType().isCheckedPointerType())
           break;
 
         // If we've found a cast expression...
@@ -6396,7 +6396,7 @@ namespace {
 
         S.Diag(Needle->getExprLoc(), 
                diag::err_cast_to_checked_fn_ptr_from_incompatible_type)
-          << ToType << NeedleTy << NeedleTy->isCheckedPointerPtrType()
+          << ToType << NeedleTy << NeedleTy.isCheckedPointerPtrType()
           << E->getSourceRange();
       }
 
@@ -6484,7 +6484,7 @@ Expr *Sema::GetArrayPtrDereference(Expr *E, QualType &Result) {
     case Expr::UnaryOperatorClass: {
       UnaryOperator *UO = cast<UnaryOperator>(E);
       if (UO->getOpcode() == UnaryOperatorKind::UO_Deref &&
-          UO->getSubExpr()->getType()->isCheckedPointerArrayType()) {
+          UO->getSubExpr()->getType().isCheckedPointerArrayType()) {
         Result = UO->getSubExpr()->getType();
         return E;
       }
@@ -6503,7 +6503,7 @@ Expr *Sema::GetArrayPtrDereference(Expr *E, QualType &Result) {
 
       // getBase returns the pointer-typed expression.
       if (getLangOpts().UncheckedPointersDynamicCheck ||
-          AS->getBase()->getType()->isCheckedPointerArrayType()) {
+          AS->getBase()->getType().isCheckedPointerArrayType()) {
         Result = AS->getBase()->getType();
         return E;
       }
@@ -6522,7 +6522,7 @@ Expr *Sema::GetArrayPtrDereference(Expr *E, QualType &Result) {
     }
     case Expr::MatrixSubscriptExprClass: {
       MatrixSubscriptExpr *MS = cast<MatrixSubscriptExpr>(E);
-      if (MS->getBase()->getType()->isCheckedPointerArrayType()) {
+      if (MS->getBase()->getType().isCheckedPointerArrayType()) {
         Result = MS->getBase()->getType();
         return E;
       }

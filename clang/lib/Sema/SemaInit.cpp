@@ -8555,7 +8555,7 @@ ExprResult InitializationSequence::Perform(Sema &S,
 
       QualType LHSType = Step->Type;
       QualType LHSInteropType;
-      if (S.getLangOpts().CheckedC && LHSType->isUncheckedPointerType()) {
+      if (S.getLangOpts().CheckedC && LHSType.isUncheckedPointerType()) {
         if (const InteropTypeExpr *IB = Entity.getAnnots().getInteropTypeExpr()) {
           bool IsParam = Entity.isParameterKind();
           LHSInteropType = S.Context.getInteropTypeAndAdjust(IB, IsParam);

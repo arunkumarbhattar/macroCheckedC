@@ -1585,7 +1585,7 @@ bool BoundsWideningUtil::SkipBlock(const CFGBlock *B) const {
 }
 
 bool BoundsWideningUtil::IsNtArrayType(const VarDecl *V) const {
-  return V && (V->getType()->isCheckedPointerNtArrayType() ||
+  return V && (V->getType().isCheckedPointerNtArrayType() ||
                V->getType()->isNtCheckedArrayType());
 }
 
