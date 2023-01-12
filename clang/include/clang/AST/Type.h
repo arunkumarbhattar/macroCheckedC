@@ -155,7 +155,7 @@ public:
     CheckedArrayPtr = 0x40,
     CheckedNtArrayPtr = 0x80,
     CVRMask = Const | Volatile | Restrict | CheckedPtr | CheckedArrayPtr
-              | CheckedNtArrayPtr,
+              | CheckedNtArrayPtr
   };
 
   enum GC {
@@ -6830,7 +6830,7 @@ inline SplitQualType SplitQualType::getSingleStepDesugaredType() const {
 
 inline const Type *QualType::getTypePtr() const {
   auto TypPtr = getCommonPtr()->BaseType;
-  PointerType *PT = (PointerType *)(TypPtr);
+  PointerType *PT = (PointerType *)(const_cast<Type*>(TypPtr));
   // If the pointer is not unchecked, either its already type resolved
   //from the qualType qualifier, or it is an explicitly typed type
   if (PT->getKind() != clang::CheckedPointerKind::Unchecked)
