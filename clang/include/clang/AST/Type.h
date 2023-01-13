@@ -151,6 +151,8 @@ public:
     Const    = 0x1,
     Restrict = 0x2,
     Volatile = 0x4,
+    Unaligned = 0x8,
+    Atomic = 0x10,
     CheckedPtr = 0x20,
     CheckedArrayPtr = 0x40,
     CheckedNtArrayPtr = 0x80,
