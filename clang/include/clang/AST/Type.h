@@ -930,6 +930,13 @@ public:
   }
 
   void addFastQualifiers(unsigned TQs) {
+    if ((TQs & ~Qualifiers::FastMask))
+    {
+      // this means TQs consists of specialized checked qualifiers qualifier bits
+      //  pointerInt class bitmangles only upto 3 bit integer values,
+      // hence we mask out everything but the first 3 bits
+      TQs &= Qualifiers::FastMask;
+    }
     assert(!(TQs & ~Qualifiers::FastMask)
            && "non-fast qualifier bits set in mask!");
     Value.setInt(Value.getInt() | TQs);
@@ -946,6 +953,13 @@ public:
 
   void removeLocalFastQualifiers() { Value.setInt(0); }
   void removeLocalFastQualifiers(unsigned Mask) {
+    if ((Mask & ~Qualifiers::FastMask))
+    {
+      // this means CVRMask consists of specialized checked qualifiers
+      //  pointerInt class bitmangles only upto 3 bit integer values,
+      // hence we mask out everything but the first 3 bits
+      Mask &= Qualifiers::FastMask;
+    }
     assert(!(Mask & ~Qualifiers::FastMask) && "mask has non-fast qualifiers");
     Value.setInt(Value.getInt() & ~Mask);
   }
