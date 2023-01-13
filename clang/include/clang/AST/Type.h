@@ -151,13 +151,13 @@ public:
     Const    = 0x1,
     Restrict = 0x2,
     Volatile = 0x4,
-    Unaligned = 0x8,
-    Atomic = 0x10,
+    _Unaligned_ = 0x8,
+    _Atomic_ = 0x10,
     CheckedPtr = 0x20,
     CheckedArrayPtr = 0x40,
     CheckedNtArrayPtr = 0x80,
-    CVRMask = Const | Volatile | Restrict | CheckedPtr | CheckedArrayPtr
-              | CheckedNtArrayPtr
+    CVRMask = Const | Volatile | Restrict | CheckedPtr | _Unaligned_ | _Atomic_ |
+              CheckedArrayPtr | CheckedNtArrayPtr
   };
 
   enum GC {
