@@ -607,16 +607,16 @@ private:
    * For example, on some architectures, the range of values for MaxAddressSpace may be 0 to 31,
    * representing 32 possible address spaces.
    */
-  // bits:     |0 1 2  3        4       5    |6|7 .. 9|10  ..12|12   ...  31|
+  // bits:     |0 1 2  3        4       5    |6|7 .. 8|9  ..11|12   ...  31|
   //           |C R V _Single _Array _NtArray|U|GCAttr|Lifetime|AddressSpace|
   uint32_t Mask = 0;
 
-  static const uint32_t UMask = 0x80;
+  static const uint32_t UMask = 0x40;
   static const uint32_t UShift = 6;
-  static const uint32_t GCAttrMask = 0x100;
+  static const uint32_t GCAttrMask = 0x180;
   static const uint32_t GCAttrShift = 7;
-  static const uint32_t LifetimeMask = 0x800;
-  static const uint32_t LifetimeShift = 10;
+  static const uint32_t LifetimeMask = 0x700;
+  static const uint32_t LifetimeShift = 9;
   static const uint32_t AddressSpaceMask =
       ~(CVRMask | UMask | GCAttrMask | LifetimeMask);
   static const uint32_t AddressSpaceShift = 12;
