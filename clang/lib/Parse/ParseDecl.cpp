@@ -4203,24 +4203,18 @@ void Parser::ParseDeclarationSpecifiers(DeclSpec &DS,
     {
       isInvalid = DS.SetTypeQual(DeclSpec::TQ_CheckedPtr, Loc, PrevSpec, DiagID,
                                  getLangOpts());
-      isInvalid = DS.SetTypeSpecType(DeclSpec::TST_plainPtr, Loc, PrevSpec,
-                                     DiagID, Policy);
       break;
     }
     case tok::kw__Array: // macro for _Array_ptr
     {
       isInvalid = DS.SetTypeQual(DeclSpec::TQ_CheckedArrayPtr, Loc, PrevSpec, DiagID,
                                  getLangOpts());
-      isInvalid = DS.SetTypeSpecType(DeclSpec::TST_arrayPtr, Loc, PrevSpec,
-                                     DiagID, Policy);
       break;
     }
     case tok::kw__Nt_array: // macro for _Nt_array_ptr
     {
       isInvalid = DS.SetTypeQual(DeclSpec::TQ_CheckedNtArrayPtr, Loc, PrevSpec, DiagID,
                                  getLangOpts());
-      isInvalid = DS.SetTypeSpecType(DeclSpec::TST_nt_arrayPtr, Loc, PrevSpec,
-                                     DiagID, Policy);
       break;
     }
     // C++ typename-specifier:
