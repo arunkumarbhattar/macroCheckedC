@@ -151,14 +151,15 @@ public:
     Const    = 0x1,
     Restrict = 0x2,
     Volatile = 0x4,
-    _Unaligned_ = 0x8,
-    _Atomic_ = 0x10,
-    CheckedPtr = 0x20,
-    CheckedArrayPtr = 0x40,
-    CheckedNtArrayPtr = 0x80,
-    CVRMask = Const | Volatile | Restrict | CheckedPtr | _Unaligned_ | _Atomic_ |
-              CheckedArrayPtr | CheckedNtArrayPtr
-  };
+//    _Unaligned_ = 0x8,
+//    _Atomic_ = 0x10,
+//    CheckedPtr = 0x20,
+//    CheckedArrayPtr = 0x40,
+//    CheckedNtArrayPtr = 0x80,
+//    CVRMask = Const | Volatile | Restrict | CheckedPtr | _Unaligned_ | _Atomic_ |
+//              CheckedArrayPtr | CheckedNtArrayPtr
+      CVRMask = Const | Volatile | Restrict
+};
 
   enum GC {
     GCNone = 0,
@@ -190,8 +191,8 @@ public:
 
   enum {
     /// The maximum supported address space number.
-    /// 20 bits should be enough for anyone.
-    MaxAddressSpace = 0xFFFFFu,
+    /// 23 bits should be enough for anyone.
+    MaxAddressSpace = 0x7fffffu,
 
     /// The width of the "fast" qualifier mask.
     FastWidth = 3,
@@ -283,20 +284,20 @@ public:
   void removeRestrict() { Mask &= ~Restrict; }
   void addRestrict() { Mask |= Restrict; }
 
-  bool hasCheckedPtr() const { return Mask & CheckedPtr; }
-  bool hasOnlyCheckedPtr() const { return Mask == CheckedPtr; }
-  void removeCheckedPtr() { Mask &= ~CheckedPtr; }
-  void addCheckedPtr() { Mask |= CheckedPtr; }
-
-  bool hasCheckedArrayPtr() const { return Mask & CheckedArrayPtr; }
-  bool hasOnlyCheckedArrayPtr() const { return Mask == CheckedArrayPtr; }
-  void removeCheckedArrayPtr() { Mask &= ~CheckedArrayPtr; }
-  void addCheckedArrayPtr() { Mask |= CheckedArrayPtr; }
-
-  bool hasCheckedNtArrayPtr() const { return Mask & CheckedNtArrayPtr; }
-  bool hasOnlyCheckedNtArrayPtr() const { return Mask == CheckedNtArrayPtr; }
-  void removeCheckedNtArrayPtr() { Mask &= ~CheckedNtArrayPtr; }
-  void addCheckedNtArrayPtr() { Mask |= CheckedNtArrayPtr; }
+//  bool hasCheckedPtr() const { return Mask & CheckedPtr; }
+//  bool hasOnlyCheckedPtr() const { return Mask == CheckedPtr; }
+//  void removeCheckedPtr() { Mask &= ~CheckedPtr; }
+//  void addCheckedPtr() { Mask |= CheckedPtr; }
+//
+//  bool hasCheckedArrayPtr() const { return Mask & CheckedArrayPtr; }
+//  bool hasOnlyCheckedArrayPtr() const { return Mask == CheckedArrayPtr; }
+//  void removeCheckedArrayPtr() { Mask &= ~CheckedArrayPtr; }
+//  void addCheckedArrayPtr() { Mask |= CheckedArrayPtr; }
+//
+//  bool hasCheckedNtArrayPtr() const { return Mask & CheckedNtArrayPtr; }
+//  bool hasOnlyCheckedNtArrayPtr() const { return Mask == CheckedNtArrayPtr; }
+//  void removeCheckedNtArrayPtr() { Mask &= ~CheckedNtArrayPtr; }
+//  void addCheckedNtArrayPtr() { Mask |= CheckedNtArrayPtr; }
 
   bool hasCVRQualifiers() const { return getCVRQualifiers(); }
   unsigned getCVRQualifiers() const { return Mask & CVRMask; }
@@ -723,6 +724,10 @@ public:
   /// NULL, use the (slightly less efficient) \c getTypePtrOrNull().
   const Type *getTypePtr() const;
 
+  void QualifyAsCheckedPtr() const;
+  void QualifyAsCheckedArrayPtr() const;
+  void QualifyAsCheckedNtArrayPtr() const;
+
   const Type *getTypePtrOrNull() const;
 
   /// Retrieves a pointer to the name of the base type.
@@ -786,23 +791,23 @@ public:
   /// Determine whether this type is volatile-qualified.
   bool isVolatileQualified() const;
 
-  bool isLocalCheckedPtrQualified() const{
-        return (getLocalFastQualifiers() & Qualifiers::CheckedPtr);
-  }
+//  bool isLocalCheckedPtrQualified() const{
+//        return (getLocalFastQualifiers() & Qualifiers::CheckedPtr);
+//  }
+//
+//  bool isCheckedPtrQualified() const;
+//
+//  bool isLocalCheckedArrayQualified() const {
+//        return (getLocalFastQualifiers() & Qualifiers::CheckedArrayPtr);
+//  }
+//
+//  bool isCheckedArrayQualified() const;
+//
+//  bool isLocalCheckedNtArrayQualified() const {
+//        return (getLocalFastQualifiers() & Qualifiers::CheckedNtArrayPtr);
+//  }
 
-  bool isCheckedPtrQualified() const;
-
-  bool isLocalCheckedArrayQualified() const {
-        return (getLocalFastQualifiers() & Qualifiers::CheckedArrayPtr);
-  }
-
-  bool isCheckedArrayQualified() const;
-
-  bool isLocalCheckedNtArrayQualified() const {
-        return (getLocalFastQualifiers() & Qualifiers::CheckedNtArrayPtr);
-  }
-
-  bool isCheckedNtArrayQualified() const;
+  //bool isCheckedNtArrayQualified() const;
 
   /// Determine whether this particular QualType instance has any
   /// qualifiers, without looking through any typedefs that might add
@@ -898,32 +903,32 @@ public:
   }
 
   /// Add the `checked` qualifier to this QualType.
-  void addCheckedPtr() {
-    addFastQualifiers(Qualifiers::CheckedPtr);
-  }
-
-  QualType withCheckedPtr() const {
-    return withFastQualifiers(Qualifiers::CheckedPtr);
-  }
-
-  /// Add the `checked array` qualifier to this QualType.
-  void addCheckedArrayPtr() {
-    addFastQualifiers(Qualifiers::CheckedArrayPtr);
-  }
-
-  QualType withCheckedArrayPtr() const {
-    return withFastQualifiers(Qualifiers::CheckedArrayPtr);
-  }
-
-  /// Add the "checked nt array" qualifier to this QualType.
-
-  void addCheckedNtArrayPtr() {
-    addFastQualifiers(Qualifiers::CheckedNtArrayPtr);
-  }
-
-  QualType withCheckedNtArrayPtr() const {
-    return withFastQualifiers(Qualifiers::CheckedNtArrayPtr);
-  }
+//  void addCheckedPtr() {
+//    addFastQualifiers(Qualifiers::CheckedPtr);
+//  }
+//
+//  QualType withCheckedPtr() const {
+//    return withFastQualifiers(Qualifiers::CheckedPtr);
+//  }
+//
+//  /// Add the `checked array` qualifier to this QualType.
+//  void addCheckedArrayPtr() {
+//    addFastQualifiers(Qualifiers::CheckedArrayPtr);
+//  }
+//
+//  QualType withCheckedArrayPtr() const {
+//    return withFastQualifiers(Qualifiers::CheckedArrayPtr);
+//  }
+//
+//  /// Add the "checked nt array" qualifier to this QualType.
+//
+//  void addCheckedNtArrayPtr() {
+//    addFastQualifiers(Qualifiers::CheckedNtArrayPtr);
+//  }
+//
+//  QualType withCheckedNtArrayPtr() const {
+//    return withFastQualifiers(Qualifiers::CheckedNtArrayPtr);
+//  }
 
   QualType withCVRQualifiers(unsigned CVR) const {
     return withFastQualifiers(CVR);
@@ -4072,9 +4077,9 @@ public:
   CallingConv getCallConv() const { return getExtInfo().getCC(); }
   ExtInfo getExtInfo() const { return ExtInfo(FunctionTypeBits.ExtInfo); }
 
-//  static_assert((~Qualifiers::FastMask & Qualifiers::CVRMask) == 0,
-//                "Const, volatile and restrict are assumed to be a subset of "
-//                "the fast qualifiers.");
+  static_assert((Qualifiers::FastMask & ~Qualifiers::CVRMask) == 0,
+                "Const, volatile and restrict are assumed to be a subset of "
+                "the fast qualifiers.");
 
   bool isConst() const { return getFastTypeQuals().hasConst(); }
   bool isVolatile() const { return getFastTypeQuals().hasVolatile(); }
@@ -6851,19 +6856,42 @@ inline const Type *QualType::getTypePtr() const {
   //from the qualType qualifier, or it is an explicitly typed type
   if (PT->getKind() != clang::CheckedPointerKind::Unchecked)
     return TypPtr;
-
-  if (this->isCheckedPtrQualified())
-  {
-    PT->setKind(CheckedPointerKind::Ptr);
-  }
-  else if (this->isCheckedArrayQualified()) {
-    PT->setKind(CheckedPointerKind::Array);
-  }
-  else if (this->isCheckedNtArrayQualified()) {
-    PT->setKind(CheckedPointerKind::NtArray);
-  }
+//
+//  if (this->isCheckedPtrQualified())
+//  {
+//    PT->setKind(CheckedPointerKind::Ptr);
+//  }
+//  else if (this->isCheckedArrayQualified()) {
+//    PT->setKind(CheckedPointerKind::Array);
+//  }
+//  else if (this->isCheckedNtArrayQualified()) {
+//    PT->setKind(CheckedPointerKind::NtArray);
+//  }
   return TypPtr;
 }
+
+inline void QualType::QualifyAsCheckedPtr() const
+{
+  auto TypPtr = getCommonPtr()->BaseType;
+  PointerType *PT = (PointerType *)(const_cast<Type*>(TypPtr));
+  PT->setKind(CheckedPointerKind::Ptr);
+}
+
+inline void QualType::QualifyAsCheckedArrayPtr() const
+{
+  auto TypPtr = getCommonPtr()->BaseType;
+  PointerType *PT = (PointerType *)(const_cast<Type*>(TypPtr));
+  PT->setKind(CheckedPointerKind::Array);
+}
+
+
+inline void QualType::QualifyAsCheckedNtArrayPtr() const
+{
+  auto TypPtr = getCommonPtr()->BaseType;
+  PointerType *PT = (PointerType *)(const_cast<Type*>(TypPtr));
+  PT->setKind(CheckedPointerKind::NtArray);
+}
+
 
 inline const Type *QualType::getTypePtrOrNull() const {
   return (isNull() ? nullptr : getCommonPtr()->BaseType);
@@ -6936,25 +6964,25 @@ inline bool QualType::isVolatileQualified() const {
          getCommonPtr()->CanonicalType.isLocalVolatileQualified();
 }
 
-inline bool QualType::isCheckedQualified() const {
-  return this->isCheckedPtrQualified() || this->isCheckedArrayQualified() ||
-         this->isCheckedNtArrayQualified();
-}
-
-inline bool QualType::isCheckedPtrQualified() const {
-  return this->getQualifiers().getCVRQualifiers()
-         & Qualifiers::CheckedPtr;
-}
-
-inline bool QualType::isCheckedArrayQualified() const {
-  return this->getQualifiers().getCVRQualifiers()
-         & Qualifiers::CheckedArrayPtr;
-}
-
-inline bool QualType::isCheckedNtArrayQualified() const {
-  return this->getQualifiers().getCVRQualifiers()
-         & Qualifiers::CheckedNtArrayPtr;
-}
+//inline bool QualType::isCheckedQualified() const {
+//  return this->isCheckedPtrQualified() || this->isCheckedArrayQualified() ||
+//         this->isCheckedNtArrayQualified();
+//}
+//
+//inline bool QualType::isCheckedPtrQualified() const {
+//  return this->getQualifiers().getCVRQualifiers()
+//         & Qualifiers::CheckedPtr;
+//}
+//
+//inline bool QualType::isCheckedArrayQualified() const {
+//  return this->getQualifiers().getCVRQualifiers()
+//         & Qualifiers::CheckedArrayPtr;
+//}
+//
+//inline bool QualType::isCheckedNtArrayQualified() const {
+//  return this->getQualifiers().getCVRQualifiers()
+//         & Qualifiers::CheckedNtArrayPtr;
+//}
 
 inline bool QualType::hasQualifiers() const {
   return hasLocalQualifiers() ||
@@ -6987,17 +7015,17 @@ inline void QualType::removeLocalVolatile() {
   removeLocalFastQualifiers(Qualifiers::Volatile);
 }
 
-inline void QualType::removeLocalCheckedPtr() {
-  removeLocalFastQualifiers(Qualifiers::CheckedPtr);
-}
-
-inline void QualType::removeLocalCheckedArrayPtr() {
-  removeLocalFastQualifiers(Qualifiers::CheckedArrayPtr);
-}
-
-inline void QualType::removeLocalCheckedNtArrayPtr() {
-  removeLocalFastQualifiers(Qualifiers::CheckedNtArrayPtr);
-}
+//inline void QualType::removeLocalCheckedPtr() {
+//  removeLocalFastQualifiers(Qualifiers::CheckedPtr);
+//}
+//
+//inline void QualType::removeLocalCheckedArrayPtr() {
+//  removeLocalFastQualifiers(Qualifiers::CheckedArrayPtr);
+//}
+//
+//inline void QualType::removeLocalCheckedNtArrayPtr() {
+//  removeLocalFastQualifiers(Qualifiers::CheckedNtArrayPtr);
+//}
 
 inline void QualType::removeLocalCVRQualifiers(unsigned Mask) {
   assert(!(Mask & ~Qualifiers::CVRMask) && "mask has non-CVR bits");
@@ -7164,8 +7192,8 @@ inline bool Type::isCheckedPointerTypeInternal() const {
 }
 
 inline bool QualType::isCheckedPointerType() const {
-  return this->getTypePtr()->isCheckedPointerTypeInternal() ||
-  this->isCheckedQualified();
+  return this->getTypePtr()->isCheckedPointerTypeInternal() ;
+         //||  this->isCheckedQualified();
 }
 
 inline bool Type::isUncheckedPointerTypeInternal() const {
@@ -7175,8 +7203,8 @@ inline bool Type::isUncheckedPointerTypeInternal() const {
 }
 
 inline bool QualType::isUncheckedPointerType() const {
-    return this->getTypePtr()->isUncheckedPointerTypeInternal() &&
-      (!this->isCheckedQualified());
+    return this->getTypePtr()->isUncheckedPointerTypeInternal();
+         //&&      (!this->isCheckedQualified());
 }
 inline bool Type::isCheckedPointerPtrTypeInternal() const {
   if (const PointerType *T = getAs<PointerType>())
@@ -7185,8 +7213,8 @@ inline bool Type::isCheckedPointerPtrTypeInternal() const {
 }
 
 inline bool QualType::isCheckedPointerPtrType() const {
-  return this->isCheckedPtrQualified() ||
-         this->getTypePtr()->isCheckedPointerPtrTypeInternal();
+  //return this->isCheckedPtrQualified() ||
+    return this->getTypePtr()->isCheckedPointerPtrTypeInternal();
 }
 
 inline bool Type::isCheckedPointerArrayTypeInternal() const {
@@ -7197,8 +7225,8 @@ inline bool Type::isCheckedPointerArrayTypeInternal() const {
 }
 
 inline bool QualType::isCheckedPointerArrayType() const {
-  return this->isCheckedArrayQualified() || this->isCheckedNtArrayQualified() ||
-         this->getTypePtr()->isCheckedPointerArrayTypeInternal();
+  //return this->isCheckedArrayQualified() || this->isCheckedNtArrayQualified() ||
+    return     this->getTypePtr()->isCheckedPointerArrayTypeInternal();
 }
 
 inline bool Type::isExactlyCheckedPointerArrayTypeInternal() const {
@@ -7208,8 +7236,8 @@ inline bool Type::isExactlyCheckedPointerArrayTypeInternal() const {
 }
 
 inline bool QualType::isExactlyCheckedPointerArrayType() const {
-  return this->isCheckedArrayQualified() ||
-         this->getTypePtr()->isExactlyCheckedPointerArrayTypeInternal();
+ // return this->isCheckedArrayQualified() ||
+   return      this->getTypePtr()->isExactlyCheckedPointerArrayTypeInternal();
 }
 
 inline bool Type::isCheckedPointerNtArrayTypeInternal() const {
@@ -7219,8 +7247,8 @@ inline bool Type::isCheckedPointerNtArrayTypeInternal() const {
 }
 
 inline bool QualType::isCheckedPointerNtArrayType() const {
-  return this->isCheckedNtArrayQualified() ||
-         this->getTypePtr()->isCheckedPointerNtArrayTypeInternal();
+  //return this->isCheckedNtArrayQualified() ||
+    return     this->getTypePtr()->isCheckedPointerNtArrayTypeInternal();
 }
 
 
@@ -7327,8 +7355,8 @@ inline bool Type::isExactlyCheckedArrayTypeInternal() const {
 }
 
 inline bool QualType::isExactlyCheckedArrayType() const {
-  return this->getTypePtr()->isExactlyCheckedArrayTypeInternal() ||
-  this->isCheckedArrayQualified();
+  return this->getTypePtr()->isExactlyCheckedArrayTypeInternal();
+  //|| this->isCheckedArrayQualified();
 }
 
 
